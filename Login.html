@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BBZ 登录</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+</head>
+<body>
+    <p><span id="accountsSpan"></span></p>
+    <p><span id="chainIdSpan"></span></p>
+    <p><span id="networkSpan"></span></p>
+    <button type="button" onclick="loginBtn()" id="loginBtn">登录</button><br/><br/><br/>
+
+    <script>
+
+         const isMetaMaskInstalled = () => {
+            const { ethereum } = window;
+            if(typeof ethereum === 'undefined') {
+                return false;
+            }
+            return ethereum.isMetaMask;
+        }
+
+        const getAccount = async () => {
+            try {
+                let accounts = await ethereum.request({method: 'eth_requestAccounts'});
+                accountsSpan.innerHTML = "Account:" + accounts;
+            } catch (error) {
+                console.error(error);
+            }
+         }
+
+         const getNetworkAndChainId = async () => {
+            try {
+                const chainId = await ethereum.request({method: 'eth_chainId'});
+                chainIdSpan.innerHTML = "ChainId:" + chainId;
+                const networkId = await ethereum.request({method: 'net_version'});
+                networkSpan.innerHTML = "Network:" + networkId;
+            } catch (error) {
+
+            }
+         }
+
+        async function loginBtn(){
+            if(isMetaMaskInstalled){
+                getNetworkAndChainId();
+                getAccount();
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                console.log(provider) // 获取provider,也就是rpc服务
+                // 请求访问钱包
+                await provider.send("eth_requestAccounts", []) 
+ 
+                const signer = provider.getSigner(); //获取签名者信息
+                this.userPk = await signer.getAddress(); // 获取签名者公钥
+                console.log(this.userPk)
+                let signature = await signer.signMessage("nonce 2312312312") // metamask 对“登录网站进行签名”
+ 
+                console.log(signature) // 打印签名
+        } else {
+                window.alert("请安装 MetaMask");
+            }
+        }
+    </script>
+</body>
+</html>
