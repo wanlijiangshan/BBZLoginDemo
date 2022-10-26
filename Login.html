@@ -12,6 +12,8 @@
     <p><span id="chainIdSpan"></span></p>
     <p><span id="networkSpan"></span></p>
     <button type="button" onclick="loginBtn()" id="loginBtn">登录</button><br/><br/><br/>
+    <input type="text" id="toAddress">
+    <button type="button" onclick="sendBtn()" id="sendBtn">转账</button><br/><br/><br/>
 
     <script>
 
@@ -58,6 +60,38 @@
                 let signature = await signer.signMessage("nonce 2312312312") // metamask 对“登录网站进行签名”
  
                 console.log(signature) // 打印签名
+        } else {
+                window.alert("请安装 MetaMask");
+            }
+        }
+
+        async function sendBtn(){
+            if(isMetaMaskInstalled){
+            try {
+                const toAddress = document.getElementById("sendBtn").value;
+                getNetworkAndChainId();
+                const accounts = await ethereum.request({method: 'eth_accounts'});
+                const txHash = await ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [{
+                        // from: accounts[0],
+                        // to: '0x......',
+                        // value: '0x29a2241af62c0000',
+                        // // gas: '0x2710',
+                        // // gasPrice: '0x09184e72a000'
+                        from: accounts[0],
+                        // to: toAddress[0],
+                        to: '0x02C1F3f4DDd291275249Ba604595C11f3A8a0AE6',
+                        value: '100000000000000',//wei
+                        // gas: '21000',
+                        // gasPrice: '20000000000',
+                        // chainId: '0x5'  
+                    }],
+                });
+                console.log(txHash);
+            } catch (error) {
+                console.error(error);
+            }
         } else {
                 window.alert("请安装 MetaMask");
             }
